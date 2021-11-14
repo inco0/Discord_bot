@@ -1,11 +1,9 @@
-import os
 import discord
 import dynamodb as dyn
+import parameters
 
-from dotenv import load_dotenv
 
-load_dotenv()
-TOKEN = os.getenv('DISCORD_TOKEN')
+TOKEN = parameters.get_discord_token("eu-central-1")
 client = discord.Client()
 
 # Read messages asynchronously from the discord server
@@ -15,6 +13,7 @@ async def on_message(message):
     # Do not read messages made from the bot itself to avoid a loop
     if message.author == client.user:
         return
+
     # Split the message content in tokens separated by a space
     message_word_list = message.content.split(" ")
     sentence_length = len(message_word_list)
