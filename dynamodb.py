@@ -9,6 +9,15 @@ primary_column_name = "word_to_be_replaced"
 columns = ["suggestions"]
 
 
+# Returns an API item with all the words that can be replaced in the dictionary
+def get_words_to_be_replaced():
+    response = client.scan(
+        TableName=table_name,
+        ProjectionExpression=primary_column_name
+    )
+    return response["Items"]
+
+
 def replace_word(word_to_be_replaced):
     db_item = get_item(word_to_be_replaced)
     status_code = db_item["ResponseMetadata"]["HTTPStatusCode"]
@@ -24,7 +33,7 @@ def replace_word(word_to_be_replaced):
         return [status_code, "API call failed"]
 
 
-# Get a table item if "word_to_be_replaced" matches a primary key in the dynamodb table
+# Get a table item if the string passed as argument matches a primary key in the dynamodb table
 def get_item(primary_key):
     response = table.get_item(
         Key={
@@ -92,7 +101,7 @@ def remove_item(word_to_be_replaced, suggestion):
             else:
                 return -1
         else:
-            # The specified key doesnt exist in the database
+            # The specified word doesnt exist in the database
             return -2
     else:
         return status_code
