@@ -105,4 +105,3 @@ def remove_item(word_to_be_replaced, suggestion):
             return -2
     else:
         return status_code
-
