@@ -6,20 +6,25 @@ import parameters
 # Get the API item of the column wih all the replaceable words in the dictionary
 api_result_list = dyn.get_words_to_be_replaced()
 # Create a list from the api result with the words that can be replaced
-words_to_be_replaced_list = [x["word_to_be_replaced"]["S"] for x in api_result_list]
-# Convert the list to set for better performance
-words_to_be_replaced_set = set(words_to_be_replaced_list)
+words_to_be_replaced_set = {x["word_to_be_replaced"]["S"] for x in api_result_list}
+# The main discord client
+client = discord.Client()
+
 
 def initiate():
+    """
+    Starts the bot by getting the token stored in ssm and running it using the discord library
+    """
     token = parameters.get_discord_token("eu-central-1")
-    client = discord.Client()
     client.run(token)
 
 
-# Read messages asynchronously from the discord server
-
+@client.event
 async def on_message(message):
-
+    """
+    Read messages asynchronously from the discord server
+    :param message: The message that is processed every time asynchronously
+    """
     # Do not read messages made from the bot itself to avoid a loop
     if message.author == client.user:
         return
@@ -48,7 +53,6 @@ async def on_message(message):
             replacement_word = message_word_list[2]
             api_result = dyn.add_item(word_to_be_replaced, replacement_word)
             if api_result == 200:
-
                 await message.channel.send(word_to_be_replaced + " -> " + replacement_word + " has been successfully added to the dictionary, thank you for your contribution.")
             elif api_result == -1:
                 await message.channel.send("The suggestion already exists")
@@ -64,8 +68,7 @@ async def on_message(message):
             replacement_word = message_word_list[2]
             api_result = dyn.remove_item(word_to_be_replaced, replacement_word)
             if api_result == 200:
-                await message.channel.send(word_to_be_replaced + " -> " + replacement_word +
-                                    " has been successfully removed from the dictionary, thank you for your contribution.")
+                await message.channel.send(word_to_be_replaced + " -> " + replacement_word + " has been successfully removed from the dictionary, thank you for your contribution.")
             elif api_result == -1:
                 await message.channel.send("The specified suggestion does not exist")
             elif api_result == -2:
